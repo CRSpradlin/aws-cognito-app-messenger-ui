@@ -10,6 +10,7 @@ const email = ref("");
 const username = ref("");
 const password = ref("");
 const confirmation = ref("");
+const dynamicAnimationClass = ref("animate-fade-in-down")
 
 const confirmUser = async () => {
     loadingState.value = true;
@@ -28,6 +29,7 @@ const confirmUser = async () => {
 }
 
 const registerUser = async () => {
+    dynamicAnimationClass.value = "";
     loadingState.value = true;
     // TODO: Handle non-200 responses
     const { data } = await useFetch(config.api.url+'/user/register', {
@@ -46,13 +48,14 @@ const registerUser = async () => {
 
     registeredProfile.value = user.profile;
     registeredUser.value = true;
+    dynamicAnimationClass.value = "animate-fade-in-down";
 }
 </script>
 
 
 <template>
     <div class="text-stone-200 bg-gradient-to-r from-teal-600 to-blue-600 grid place-items-center w-screen h-screen">
-        <div class="flex flex-col content-center bg-cyan-900 p-12 rounded-xl">
+        <div v-bind:class="dynamicAnimationClass" class="flex flex-col content-center bg-cyan-900 p-12 rounded-xl">
             <div v-if="confirmedUser">
                 <span class="text-4xl p-2">User Confirmed</span>
             </div>
