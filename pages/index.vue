@@ -1,52 +1,44 @@
 <script setup>
-const config = useAppConfig();
 const user = useUser();
 
 const loadingState = ref(false);
 const registeredUser = ref(false);
 const confirmedUser = ref(false);
-const registeredProfile = ref("");
 const email = ref("");
 const username = ref("");
 const password = ref("");
 const confirmation = ref("");
-const dynamicAnimationClass = ref("animate-fade-in-down")
+const dynamicAnimationClass = ref("animate-fade-in-down");
 
 const confirmUser = async () => {
     loadingState.value = true;
-    const { data } = await useFetch(config.api.url+'/user/confirm', {
-        method: 'POST', 
-        body: {
-            username,
-            confirmation
-        }
+    const dataValue = await cognitoFetch('/user/confirm', {
+        username: username.value,
+        confirmation: confirmation.value
     });
     loadingState.value = false;
 
     confirmedUser.value = true;
-
-    console.log(data);
+    user.value.confirmed = true;
 }
 
 const registerUser = async () => {
     dynamicAnimationClass.value = "";
     loadingState.value = true;
-    // TODO: Handle non-200 responses
-    const { data } = await useFetch(config.api.url+'/user/register', {
-        method: 'POST', 
-        body: {
-            username,
-            email,
-            password
-        }
+    const dataValue = await cognitoFetch('/user/register', {
+        username: username.value,
+        email: email.value,
+        password: password.value
     });
     loadingState.value = false;
 
-    user.name = username;
-    user.profile = data.value['UserSub'];
-    user.confirmed = data.value['UserConfirmed'];
+    user.value = {
+        ...user.value,
+        name: username.value,
+        profile: dataValue['UserSub'],
+        confirmed: dataValue['UserConfirmed']
+    };
 
-    registeredProfile.value = user.profile;
     registeredUser.value = true;
     dynamicAnimationClass.value = "animate-fade-in-down";
 }
@@ -56,12 +48,12 @@ const registerUser = async () => {
 <template>
     <div class="text-stone-200 bg-gradient-to-r from-teal-600 to-blue-600 grid place-items-center w-screen h-screen">
         <div v-bind:class="dynamicAnimationClass" class="flex flex-col content-center bg-cyan-900 p-12 rounded-xl">
-            <div v-if="confirmedUser">
+            <div v-if="confirmedUser" class="flex flex-col text-center">
                 <span class="text-4xl p-2">User Confirmed</span>
+                <span>{{user}}</span>
             </div>
             <div v-else>
                 <div v-if="registeredUser">
-                    <!-- TODO: Show confirmation form -->
                     <div class="flex flex-col">
                         <span class="text-4xl pr-2 pl-2 pt-2">Confirm</span>
                         <span class="text-xl pr-2 pl-2">A confirmation code was sent to: {{email}}</span>
