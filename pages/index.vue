@@ -2,45 +2,68 @@
 const user = useUser();
 
 const loadingState = ref(false);
+const errorState = ref(false);
 const registeredUser = ref(false);
 const confirmedUser = ref(false);
-const email = ref("");
-const username = ref("");
-const password = ref("");
-const confirmation = ref("");
+const email = ref('');
+const username = ref('');
+const password = ref('');
+const confirmation = ref('');
+const errorMessage = ref('');
 const dynamicAnimationClass = ref("animate-fade-in-down");
 
+const showError = (message) => {
+    errorMessage.value = message;
+    errorState.value = true;
+}
+
+const clearError = () => {
+    errorState.value = false;
+    errorMessage.value = '';
+} 
+
 const confirmUser = async () => {
+    clearError();
     loadingState.value = true;
-    const dataValue = await cognitoFetch('/user/confirm', {
+    const { responseValue } = await cognitoFetch('/user/confirm', {
         username: username.value,
         confirmation: confirmation.value
     });
     loadingState.value = false;
 
-    confirmedUser.value = true;
-    user.value.confirmed = true;
+    if (responseValue.ok) {
+        confirmedUser.value = true;
+        user.value.confirmed = true;
+    } else {
+        confirmation.value = '';
+        showError('Incorrect confirmation code, please try again...');
+    }
 }
 
 const registerUser = async () => {
-    dynamicAnimationClass.value = "";
+    clearError();
+    dynamicAnimationClass.value = '';
     loadingState.value = true;
-    const dataValue = await cognitoFetch('/user/register', {
+    const { dataValue, responseValue } = await cognitoFetch('/user/register', {
         username: username.value,
         email: email.value,
         password: password.value
     });
     loadingState.value = false;
 
-    user.value = {
-        ...user.value,
-        name: username.value,
-        profile: dataValue['UserSub'],
-        confirmed: dataValue['UserConfirmed']
-    };
+    if (responseValue.ok) {
+        user.value = {
+            ...user.value,
+            name: username.value,
+            profile: dataValue['UserSub'],
+            confirmed: dataValue['UserConfirmed']
+        };
 
-    registeredUser.value = true;
-    dynamicAnimationClass.value = "animate-fade-in-down";
+        registeredUser.value = true;
+        dynamicAnimationClass.value = 'animate-fade-in-down';
+    } else {
+        showError('Something went wrong with your request, please try again...');
+    }
 }
 </script>
 
@@ -92,6 +115,11 @@ const registerUser = async () => {
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+            <div v-if="errorState">
+                <div :class="registeredUser ? 'max-w-md' : 'max-w-xs'" class="flex flex-col">
+                    <div class="text-red-500 p-2 inline-flex">{{errorMessage}}</div>
                 </div>
             </div>
         </div>
