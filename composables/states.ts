@@ -5,6 +5,6 @@ export const useUser = () => {
             name: '',
             profile: '',
             confirmed: false
-        }
+        };
     });
-}
+};

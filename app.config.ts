@@ -3,4 +3,4 @@ export default defineAppConfig({
     api: {
         url: 'https://backend.api.url'
     }
-})
+});
