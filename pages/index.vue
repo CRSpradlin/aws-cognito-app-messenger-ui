@@ -25,18 +25,18 @@ const clearError = () => {
 const confirmUser = async () => {
     clearError();
     loadingState.value = true;
-    const { responseValue } = await cognitoFetch('/user/confirm', {
+    const { error } = await cognitoFetch('/user/confirm', {
         username: username.value,
         confirmation: confirmation.value
     });
     loadingState.value = false;
 
-    if (responseValue.ok) {
+    if (error.value === null) {
         confirmedUser.value = true;
         user.value.confirmed = true;
     } else {
         confirmation.value = '';
-        showError('Incorrect confirmation code, please try again...');
+        showError(error.value.data.error.message);
     }
 };
 
@@ -44,25 +44,25 @@ const registerUser = async () => {
     clearError();
     dynamicAnimationClass.value = '';
     loadingState.value = true;
-    const { dataValue, responseValue } = await cognitoFetch('/user/register', {
+    const { data, error } = await cognitoFetch('/user/register', {
         username: username.value,
         email: email.value,
         password: password.value
     });
     loadingState.value = false;
 
-    if (responseValue.ok) {
+    if (error.value === null) {
         user.value = {
             ...user.value,
             name: username.value,
-            profile: dataValue.UserSub,
-            confirmed: dataValue.UserConfirmed
+            profile: data.value.UserSub,
+            confirmed: data.value.UserConfirmed
         };
 
         registeredUser.value = true;
         dynamicAnimationClass.value = 'animate-fade-in-down';
     } else {
-        showError('Something went wrong with your request, please try again...');
+        showError(error.value.data.error.message);
     }
 };
 </script>
