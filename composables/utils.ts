@@ -1,21 +1,17 @@
 export const cognitoFetch = async (path, body) => {
     const config = useAppConfig();
 
-    let responseValue;
-
-    const { data } = await useFetch(config.api.url + path, {
+    const { data, error } = await useFetch(config.api.url + path, {
         method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
         body,
-        initialCache: false, // Global definition causes cached response returns
-        onResponse ({ response }) {
-            // Process the response data
-            responseValue = response;
-            return response._data;
-        }
+        initialCache: false // Global definition causes cached response returns
     });
 
     return {
-        dataValue: data.value,
-        responseValue
+        data,
+        error
     };
 };
