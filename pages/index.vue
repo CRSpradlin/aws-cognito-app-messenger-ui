@@ -36,7 +36,7 @@ const confirmUser = async () => {
         user.value.confirmed = true;
     } else {
         confirmation.value = '';
-        showError(error.value.data.error.message);
+        showError(error.value.data.info.message);
     }
 };
 
@@ -62,7 +62,7 @@ const registerUser = async () => {
         registeredUser.value = true;
         dynamicAnimationClass.value = 'animate-fade-in-down';
     } else {
-        showError(error.value.data.error.message);
+        showError(error.value.data.info.message);
     }
 };
 </script>
