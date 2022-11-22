@@ -3,9 +3,9 @@ const user = useUser();
 
 const loadingState = ref(false);
 const errorState = ref(false);
-const registeredUser = ref(false);
-const confirmedUser = ref(false);
-const email = ref('');
+const registeredUser = ref(user.value && user.value.profile);
+const confirmedUser = ref(user.value && user.value.confirmed ? user.value.confirmed : false);
+const email = ref(user.value && user.value.email ? user.value.email : '');
 const username = ref('');
 const password = ref('');
 const confirmation = ref('');
@@ -26,14 +26,17 @@ const confirmUser = async () => {
     clearError();
     loadingState.value = true;
     const { error } = await cognitoFetch('/user/confirm', {
-        username: username.value,
+        username: user.value.name,
         confirmation: confirmation.value
     });
     loadingState.value = false;
 
     if (error.value === null) {
         confirmedUser.value = true;
-        user.value.confirmed = true;
+        user.value = {
+            ...user.value,
+            confirmed: true
+        };
     } else {
         confirmation.value = '';
         showError(error.value.data.info.message);
@@ -55,6 +58,7 @@ const registerUser = async () => {
         user.value = {
             ...user.value,
             name: username.value,
+            email: email.value,
             profile: data.value.UserSub,
             confirmed: data.value.UserConfirmed
         };
