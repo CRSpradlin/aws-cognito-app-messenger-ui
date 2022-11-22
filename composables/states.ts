@@ -1,10 +1,11 @@
+export type User = {
+    token: string,
+    name: string,
+    email: string,
+    profile: string,
+    confirmed: boolean
+}
+
 export const useUser = () => {
-    return useState('user', () => {
-        return {
-            token: '',
-            name: '',
-            profile: '',
-            confirmed: false
-        };
-    });
+    return useCookie<User>('user');
 };
