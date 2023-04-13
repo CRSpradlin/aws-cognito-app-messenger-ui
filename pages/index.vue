@@ -65,8 +65,6 @@ const registerUser = async () => {
 
         registeredUser.value = true;
         dynamicAnimationClass.value = 'animate-fade-in-down';
-    } else if (error.value.data.info.code === 1401) { // Invalid Password Error
-        showError(error.value.data.context);
     } else {
         showError(error.value.data.info.message);
     }
