@@ -1,5 +1,7 @@
 <script setup>
-const user = useUser();
+definePageMeta({
+    middleware: 'auth'
+});
 
 const dynamicAnimationClass = ref('animate-fade-in-down');
 </script>
@@ -17,9 +19,9 @@ const dynamicAnimationClass = ref('animate-fade-in-down');
             <span>Register</span>
           </NuxtLink>
         </div>
-        <div v-if="user">
+        <!-- <div v-if="user">
           <span class="text-4xl p-2">{{ user.name }}</span>
-        </div>
+        </div> -->
       </div>
     </div>
   </div>
