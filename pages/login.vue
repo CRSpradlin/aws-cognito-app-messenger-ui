@@ -1,4 +1,8 @@
 <script setup>
+definePageMeta({
+    middleware: 'auth'
+});
+
 const user = useUser();
 
 const loadingState = ref(false);
@@ -40,7 +44,9 @@ const loginUser = async () => {
             token: data.value.AuthenticationResult.AccessToken
         };
 
-        return navigateTo('/');
+        console.log(user);
+
+        return navigateTo('/dashboard');
     } else {
         showError(error.value.data.info.message);
     }

@@ -1,6 +1,6 @@
 export default defineAppConfig({
     title: 'AWS Cognito App UI',
     api: {
-        url: 'https://backend.api.url'
+        url: 'https://aws.crspradlin.org/rest'
     }
 });
