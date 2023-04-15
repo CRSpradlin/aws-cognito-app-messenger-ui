@@ -1,8 +1,9 @@
-const user = useUser();
-
 export default defineNuxtRouteMiddleware((to, from) => {
-    // isAuthenticated() is an example method verifying if a user is authenticated
-    if (user && user.value && user.value.confirmed) {
+    if (to.fullPath !== '/dashboard' && isAuthenticated()) {
         return navigateTo('/dashboard');
+    } else if (to.fullPath === '/dashboard') {
+        return navigateTo('/');
+    } else {
+        //
     }
 });

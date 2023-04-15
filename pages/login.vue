@@ -44,8 +44,6 @@ const loginUser = async () => {
             token: data.value.AuthenticationResult.AccessToken
         };
 
-        console.log(user);
-
         return navigateTo('/dashboard');
     } else {
         showError(error.value.data.info.message);

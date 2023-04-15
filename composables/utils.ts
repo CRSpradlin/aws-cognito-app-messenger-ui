@@ -15,3 +15,19 @@ export const cognitoFetch = async (path, body) => {
         error
     };
 };
+
+export const isAuthenticated = () => {
+    const user = useUser();
+    return (user && user.value && user.value.confirmed);
+};
+
+export const clearUser = () => {
+    const user = useUser();
+    user.value = {
+        name: null,
+        token: null,
+        profile: null,
+        email: null,
+        confirmed: false
+    };
+};
