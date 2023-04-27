@@ -4,13 +4,15 @@ definePageMeta({
 });
 
 const user = useUser();
+const route = useRoute();
 
 const loadingState = ref(false);
 const errorState = ref(false);
-const registeredUser = ref(user.value && user.value.profile);
-const confirmedUser = ref(user.value && user.value.confirmed ? user.value.confirmed : false);
-const email = ref(user.value && user.value.email ? user.value.email : '');
+const registeredUser = ref(false || route.query.profile);
+const confirmedUser = ref(false);
+const email = ref(route.query.email ? route.query.email : '');
 const username = ref('');
+const profile = ref('');
 const password = ref('');
 const confirmation = ref('');
 const errorMessage = ref('');
@@ -30,7 +32,7 @@ const confirmUser = async () => {
     clearError();
     loadingState.value = true;
     const { error } = await cognitoFetch('/user/confirm', {
-        username: user.value.name,
+        profile: profile.value,
         confirmation: confirmation.value
     });
     loadingState.value = false;
@@ -42,7 +44,7 @@ const confirmUser = async () => {
             confirmed: true
         };
 
-        return navigateTo('/dashboard');
+        return navigateTo('/login');
     } else {
         confirmation.value = '';
         showError(error.value.data.info.message);
@@ -61,14 +63,7 @@ const registerUser = async () => {
     loadingState.value = false;
 
     if (error.value === null) {
-        user.value = {
-            ...user.value,
-            name: username.value,
-            email: email.value,
-            profile: data.value.UserSub,
-            confirmed: data.value.UserConfirmed
-        };
-
+        profile.value = data.value.UserSub;
         registeredUser.value = true;
         dynamicAnimationClass.value = 'animate-fade-in-down';
     } else {
@@ -84,7 +79,7 @@ const registerUser = async () => {
         <div class="flex flex-col">
           <span class="text-4xl pr-2 pl-2 pt-2">Confirm</span>
           <span class="text-xl pr-2 pl-2">A confirmation code was sent to: {{ email }}</span>
-          <span class="text-xl pr-2 pl-2 pb-2">Please enter the code below and click confirm</span>
+          <span class="text-xl pr-2 pl-2 pb-2">Please enter the code below and click confirm.</span>
           <div class="flex flex-col p-2">
             <label class="text-2xl" for="confirmation">Confirmation Code</label>
             <input v-model="confirmation" class="text-stone-800 text-2xl rounded" name="confirmation" type="text">
