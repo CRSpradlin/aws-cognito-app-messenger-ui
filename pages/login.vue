@@ -7,7 +7,8 @@ const user = useUser();
 
 const loadingState = ref(false);
 const errorState = ref(false);
-const loggedInUser = ref(user.value && user.value.profile);
+
+const loggedInUser = ref(false || user.value !== undefined);
 
 const username = ref('');
 const password = ref('');
@@ -37,14 +38,13 @@ const loginUser = async () => {
     if (error.value === null) {
         user.value = {
             ...user.value,
-            name: data.value.UserAttributes.Username,
-            email: data.value.UserAttributes.UserAttributes.find(item => item.Name === 'email').Value,
-            profile: data.value.UserAttributes.UserAttributes.find(item => item.Name === 'profile').Value,
-            confirmed: data.value.UserAttributes.UserAttributes.find(item => item.Name === 'email_verified').Value === 'true',
-            token: data.value.AuthenticationResult.AccessToken
+            token: data.value.AuthenticationResult.AccessToken,
+            ...data.value.User
         };
 
         return navigateTo('/dashboard');
+    } else if (error.value.data.info.code === 5504) {
+        return navigateTo('/register?email=' + error.value.data.context.user.email + '&profile=' + error.value.data.context.user.profile);
     } else {
         showError(error.value.data.info.message);
     }
