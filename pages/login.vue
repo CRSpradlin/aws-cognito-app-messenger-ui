@@ -38,7 +38,7 @@ const loginUser = async () => {
     if (error.value === null) {
         user.value = {
             ...user.value,
-            token: data.value.AuthenticationResult.AccessToken,
+            token: data.value.AuthenticationResult.IdToken,
             ...data.value.User
         };
 
