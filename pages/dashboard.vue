@@ -1,12 +1,17 @@
 <script setup>
+definePageMeta({
+    middleware: 'auth'
+});
+
 const conversationData = ref([]);
-const messageData = ref([]);
+const messageData = ref({});
 const errorState = ref(false);
 const loadingState = ref(false);
 const errorMessage = ref('');
 const displayCreateConvoModal = ref(false);
 const dynamicAnimationClass = ref('animate-fade-in-down');
 const newConvoName = ref('');
+const newConvoMessage = ref('');
 const selectedConversation = ref('');
 const msgLoadingState = ref(false);
 
@@ -14,6 +19,16 @@ const logout = () => {
     clearUser();
     navigateTo('/');
 };
+
+const sendMessage = () => {
+  loadingState.value = true;
+  cognitoFetch(`/conversation/${selectedConversation.value}/message/create`,{
+    messageBody: newConvoMessage.value
+  }, true).then(({ data }) => {
+    messageData.value.messages.unshift(data.value.message);
+    loadingState.value = false;
+  });
+}
 
 const updateConversations = () => {
   cognitoFetch('/conversation', null, true).then(({ data }) => {
@@ -89,7 +104,7 @@ const getMessageData = () => {
         </div>
       </div>
     </div>
-    <div v-else>
+    <div v-else class="p-6 h-full">
       <div class="flex flex-row">
         <div class="float-left m-auto flex-col text-stone-100 w-fit p-2 text-2xl text-center bg-violet-500 rounded-xl hover:bg-violet-400 active:bg-violet-600" @click="flipDisplayCreateConvoModal()">
           <span>Create Conversation</span>
@@ -99,7 +114,7 @@ const getMessageData = () => {
         </div>
       </div>
 
-      <div class="flex flex-row p-2">
+      <div class="flex flex-row p-2 h-full">
         <div class="w-1/4 flex flex-col">
           <div v-for="conversation of conversationData" :key="conversation.id" class="m-2 text-center p-3 bg-cyan-900 hover:bg-cyan-700 rounded-xl" @click="setConversationId(conversation.id)">
             <div>
@@ -107,11 +122,17 @@ const getMessageData = () => {
             </div>
           </div>
         </div>
-        <div class="w-3/4 m-2 p-3 flex flex-col bg-cyan-900 rounded-xl">
-          <div class="flex flex-col">
+        <div class="w-3/4 m-2 p-3 flex flex-col-reverse bg-cyan-900 rounded-xl">
+          <div class="flex flex-row w-full">
+            <input v-model="newConvoMessage" class="w-11/12 text-stone-800 text-md rounded" name="newConvoMessage" type="text">
+            <button :disabled="loadingState" class="w-1/12 h-10 text-stone-100  text-md text-center bg-violet-500 rounded-md hover:bg-violet-400 active:bg-violet-600" @click="sendMessage()">
+              <img v-if="loadingState" class="h-8 w-8 m-auto" src="/assets/images/loading.gif">
+              <span v-else>Send</span>
+            </button>
+          </div>
+          <div class="flex flex-col-reverse overflow-y-scroll">
             Messages
-            <!-- Add messages from conversations -->
-            <img v-if="msgLoadingState" src="/assets/images/loading.gif" class="h-20 w-20">
+            <img v-if="msgLoadingState" src="/assets/images/loading.gif" class="w-20">
             <div v-for="message of messageData.messages" :key="message.sentDate" class="m-2">
               <div>{{ message.userProfile }}</div>
               <div>{{ message.body }}</div>
