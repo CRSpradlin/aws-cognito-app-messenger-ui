@@ -38,7 +38,8 @@ const loginUser = async () => {
     if (error.value === null) {
         user.value = {
             ...user.value,
-            token: data.value.AuthenticationResult.IdToken,
+            apitoken: data.value.AuthenticationResult.IdToken,
+            sockettoken: data.value.AuthenticationResult.AccessToken,
             ...data.value.User
         };
 

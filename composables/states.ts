@@ -1,5 +1,6 @@
 export type User = {
-    token: string,
+    apitoken: string,
+    sockettoken: string,
     name: string,
     email: string,
     profile: string,
@@ -9,3 +10,7 @@ export type User = {
 export const useUser = () => {
     return useCookie<User>('user');
 };
+
+export const useSocket = () => {
+    return useState<WebSocket>('socket');
+}
