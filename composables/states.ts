@@ -10,7 +10,3 @@ export type User = {
 export const useUser = () => {
     return useCookie<User>('user');
 };
-
-export const useSocket = () => {
-    return useState<WebSocket>('socket');
-}

@@ -3,6 +3,8 @@ definePageMeta({
     middleware: 'auth'
 });
 
+const config = useAppConfig();
+const user = useUser();
 const conversationData = ref([]);
 const messageData = ref({});
 const errorState = ref(false);
@@ -20,12 +22,22 @@ const logout = () => {
     navigateTo('/');
 };
 
+if (user && user.value && user.value.sockettoken) {
+  const socket = new WebSocket(config.socket.uri, user.value.sockettoken);
+  socket.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    const message = data.newMessage;
+    if (message.conversationId === selectedConversation.value) {
+      messageData.value.messages.unshift(message);
+    }
+  };
+}
+
 const sendMessage = () => {
   loadingState.value = true;
   cognitoFetch(`/conversation/${selectedConversation.value}/message/create`,{
     messageBody: newConvoMessage.value
   }, true).then(({ data }) => {
-    messageData.value.messages.unshift(data.value.message);
     loadingState.value = false;
   });
 }

@@ -1,5 +1,3 @@
-import { useSocket } from "./states";
-
 export const cognitoFetch = async (path, body, authNeeded = false) => {
     const user = useUser();
     const config = useAppConfig();
@@ -28,29 +26,14 @@ export const cognitoFetch = async (path, body, authNeeded = false) => {
 
 export const isAuthenticated = () => {
     const user = useUser();
-    const socket = useSocket();
-    const config = useAppConfig();
 
     const authCheck = (user && user.value && user.value.confirmed);
-
-    if (authCheck) {
-        if (socket.value == null) {
-            socket.value = new WebSocket(config.socket.uri, user.value.sockettoken);
-        }
-            
-    }
 
     return authCheck;
 };
 
 export const clearUser = () => {
     const user = useUser();
-    const socket = useSocket();
-    
-    if (socket.value != null)
-        socket.value.close();
-
-    socket.value = null;
 
     user.value = {
         name: null,
